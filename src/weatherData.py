@@ -17,6 +17,9 @@ daily_forecast_data = None
 air_apllution_data = None
 
 
+def hpa_to_inhg(hpa):
+    return hpa * 0.02953
+
 def fetch_current_weather():
     global current_weather_data
     # Get current weather data from api
@@ -30,12 +33,24 @@ def fetch_current_weather():
     current_weather_data.relativehumidity_2m["level_str"] = classify_humidity_level(
         current_weather_data.relativehumidity_2m.get("data")
     )
+
+
     current_weather_data.windspeed_10m["level_str"] = classify_wind_speed_level(
         current_weather_data.windspeed_10m.get("data")
     )
+
+    #Check User Location for Units in Air Pressure
     current_weather_data.surface_pressure["level_str"] = classify_presssure_level(
         current_weather_data.surface_pressure.get("data")
     )
+
+
+    if settings.unit == "imperial":
+        current_weather_data.surface_pressure["data"] = hpa_to_inhg(current_weather_data.surface_pressure["data"])
+        current_weather_data.surface_pressure["unit"] = "inHg"
+    else:
+        current_weather_data.surface_pressure["unit"] = "hPa"
+
 
     return current_weather_data
 
